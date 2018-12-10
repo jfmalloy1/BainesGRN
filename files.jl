@@ -22,14 +22,20 @@ function genotypes(init_chars, coding_len)
   #Open and writes 4 bug files
   for m in 1:4
     f = open("bug$m.csv", "w")
+    g = open("bug$m.phenotype.csv", "w")
     for i in 1:100
       genes = ""
       for j in 1:18
         genes = genes*rand_seq(init_chars)*","
       end
-      println(f, genes*rand_seq(coding_len))
+      codingseq = rand_seq(coding_len)
+      #add coding sequence to the end of the genotype
+      println(f, genes*codingseq)
+      #add coding sequence to phenotype (initial state - all genes are expressed)
+      println(g, codingseq)
     end
     close(f)
+    close(g)
   end
 end
 
