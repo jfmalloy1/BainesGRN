@@ -19,10 +19,25 @@ end
 
 #Writes the genotypes for each bug
 function genotypes(init_chars, coding_len)
+  #Bug header
+  fheader = ""
+  for i in 1:8
+    fheader = fheader*"pos,"
+  end
+  for i in 1:8
+    fheader = fheader*"neg,"
+  end
+  fheader = fheader*"coding"
+
+  #Phenotype header
+  gheader = "phenotype"
+
   #Open and writes 4 bug files
   for m in 1:4
     f = open("bug$m.csv", "w")
+    println(f, fheader)
     g = open("bug$m.phenotype.csv", "w")
+    println(g, gheader)
     for i in 1:100
       genes = ""
       for j in 1:18
@@ -42,10 +57,25 @@ end
 function environment(coding_len)
   #15 environments - 6 input, 100 have to have, 100 must not have
   #all length coding_len
+
+  #header
+  header = ""
+  for i in 1:6
+    header = header*"input,"
+  end
+  for i in 1:100
+    header = header*"HTH,"
+  end
+  for i in 1:99
+    header = header*"MNH,"
+  end
+  header = header*"MNH"
+
   f = open("environment.csv", "w")
+  println(f, header)
   for i in 1:15
     env = ""
-    for i in 1:105
+    for i in 1:205
       env = env*rand_seq(coding_len)*","
     end
     println(f, env*rand_seq(coding_len))
