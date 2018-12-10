@@ -20,16 +20,20 @@ end
 function genotypes()
   n = 4 #number of initial characters
 
-  #Open and writes a genotype file
-  f = open("bug1.txt", "w")
-  for i in 1:100
-    genes = ""
-    for j in 1:18
-      genes = genes*rand_seq(n)*","
+  #Open and writes 4 bug files
+  for m in 1:4
+    #filename = "bug" * n * ".txt"
+    #println(filename)
+    f = open("bug$m.txt", "w")
+    for i in 1:100
+      genes = ""
+      for j in 1:18
+        genes = genes*rand_seq(n)*","
+      end
+      println(f, genes*rand_seq(5))
     end
-    println(f, genes*rand_seq(5))
+    close(f)
   end
-  close(f)
 end
 
 function main()
