@@ -21,10 +21,10 @@ end
 function genotypes(init_chars, coding_len)
   #Bug header
   fheader = ""
-  for i in 1:8
+  for i in 1:9
     fheader = fheader*"pos,"
   end
-  for i in 1:8
+  for i in 1:9
     fheader = fheader*"neg,"
   end
   fheader = fheader*"coding"
