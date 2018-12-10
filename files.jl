@@ -47,7 +47,7 @@ function genotypes(init_chars, coding_len)
       #add coding sequence to the end of the genotype
       println(f, genes*codingseq)
       #add coding sequence to phenotype (initial state - all genes are expressed)
-      println(g, codingseq*",")
+      println(g, codingseq)
     end
     close(f)
     close(g)
