@@ -179,9 +179,7 @@ function run4(bug, Pm, PD)
                     #TODO add in add_letter()
                 #randomly pick a position, delete that letter
                 else
-                    println("Before: ", data[cols[i]][j])
                     data[cols[i]][j] = delete_letter(data[cols[i]][j])
-                    println("After: ", data[cols[i]][j])
                 end
             end
         end
