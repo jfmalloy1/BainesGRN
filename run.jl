@@ -15,6 +15,7 @@ function occurs(row, seq, reg)
     end
     return sum
 end
+
 #checks to see how many times the coding sequence appears in positive and negative controls
 function check_control(codingseq, phenotype, bug)
     sum = 0
@@ -107,17 +108,100 @@ function run2(env, bug)
     return fitness
 end
 
+#Randomly picks a letter (A-D)
+#Returns the letter that was picked
+function pick_letter()
+    r = rand(1:4)
+    if r == 1
+        return 'A'
+    elseif r == 2
+        return 'B'
+    elseif r == 3
+        return 'C'
+    else
+        return 'D'
+    end
+
+end
+
+#Take in a string, change a single letter in it
+#s: the string to be changed
+function change(s)
+    #random position that will be changed
+    p = rand(1:length(s))
+
+    #randomly change to 1:4
+    r = rand(1:4)
+    s = collect(s)
+    s[p] = pick_letter()
+    s = join(s)
+    return s
+end
+
+function add_letter(s)
+    #random position (letter will be added on at the end)
+    p = rand(1:length(s))
+    c = pick_leter()
+    #TODO add c to the middle of the string
+
+end
+
+function delete_letter(s)
+    #Letter at position p will be deleted
+    p = rand(1:length(s))
+    s = collect(s)
+    deleteat!(s, p)
+    s = join(s)
+    return s
+end
+#Run 4: Mutate the genome of each bug according to pre-defined probabilities
+#bug: the name of the bug file to mutate
+#Pc: probability of changing a letter
+#Pa: probability of adding a letter
+#Pd: probability of deleting a letter
+#PD: probability of deleting entire sequence (does not apply to coding sequence)
+function run4(bug, Pm, PD)
+    data = CSV.read(bug)
+
+    #array of column names
+    cols = names(data)
+    for i in 1:length(cols)
+        for j in 1:length(data[cols[i]])
+            #check if there is a mutation
+            if (rand(Float64) < Pm)
+                #change (1), addition (2), deletion (3)
+                c = rand(1:3)
+                #randomly pick a letter, change it to A, B, C, D
+                if c == 1
+                    data[cols[i]][j] = change(data[cols[i]][j])
+                #randomly pick a position, add a letter following it
+                elseif c == 2
+                    #TODO add in add_letter()
+                #randomly pick a position, delete that letter
+                else
+                    println("Before: ", data[cols[i]][j])
+                    data[cols[i]][j] = delete_letter(data[cols[i]][j])
+                    println("After: ", data[cols[i]][j])
+                end
+            end
+        end
+    end
+end
+
 function main()
     #pick environment (1-15)
     env = (rand(Int) % 15) + 1
 
     #loop through all bugs
     bugs = ["bug1.csv", "bug2.csv", "bug3.csv", "bug4.csv"]
-    for bug in bugs
-        run1(env, bug)
-        fitness = run2(env, bug[1:end-4])
-        println("Fitness of $bug is $fitness")
-    end
+    #for bug in bugs
+    #    run1(env, bug)
+    #    fitness = run2(env, bug[1:end-4])
+    #    println("Fitness of $bug is $fitness")
+    #end
+
+    #bug, probability of mutation (change, deletion, or addition), probability of deletion
+    run4(bugs[1], .5, .05)
 end
 
 main()
