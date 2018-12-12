@@ -9,7 +9,7 @@ function occurs(row, seq, reg)
     sum = 0
     properties = map(Symbol, filter(s -> occursin(reg, s), map(string, propertynames(row))))
     for name in properties
-        if occursin(Regex(getproperty(row, name)), seq)
+        if (!ismissing(getproperty(row, name)) && occursin(Regex(getproperty(row, name)), seq))
             sum = sum + 1
         end
     end
@@ -152,15 +152,19 @@ function add_letter(s)
     return s
 end
 
-#Delete a single letter from a string
+#Delete a single letter from a string, unless it fully deletes a sequence
 #s: the string to be changed
 function delete_letter(s)
-    #Letter at position p will be deleted
-    p = rand(1:length(s))
-    s = collect(s)
-    deleteat!(s, p)
-    s = join(s)
-    return s
+    if length(s) == 1
+        return s
+    else
+        #Letter at position p will be deleted
+        p = rand(1:length(s))
+        s = collect(s)
+        deleteat!(s, p)
+        s = join(s)
+        return s
+    end
 end
 
 #Run 4: Mutate the genome of each bug according to pre-defined probabilities
@@ -203,14 +207,26 @@ function run4(bug, Pm, PD)
 end
 
 function main()
+    #output file
+    f = open("fitness.csv", "w")
+
     #pick environment (1-15)
-    env = (rand(Int) % 15) + 1
+    env = abs((rand(Int) % 15) + 1)
     println("Env is: $env")
     #all bugs
-    bugs = ["bug1.csv", "bug2.csv", "bug3.csv", "bug4.csv", "bug5.csv"]
+    bugs = []
+    for i in 1:20
+        bug = "bug$i.csv"
+        push!(bugs, bug)
+    end
 
     for i in 1:20
+        #time step to data file
+        print(f, i)
+
         println("Run$i")
+
+        #Max fitness calculation
         max = -Inf
         max_bug = bugs[1]
 
@@ -222,17 +238,23 @@ function main()
                 max = fitness
                 max_bug = bug
             end
-            run4(bug, 0, 0)
+            run4(bug, .5, .05)
+            #Fitness output
             println("Fitness of $bug is $fitness")
+            print(f, ",$fitness")
 
         end
-
         #bug with highest fitness randomly switched with a bug
         r = rand(1:length(bugs))
         str = "Replacement: "*bugs[r]*" replaced with $max_bug"
         println(str)
-        bugs[r] = max_bug
+        if bugs[r] != max_bug
+            Base.Filesystem.cp(max_bug, bugs[r], force=true)
+        end
+        #Next line in data file
+        println(f)
     end
+    close(f)
 end
 
 main()
