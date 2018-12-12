@@ -138,14 +138,22 @@ function change(s)
     return s
 end
 
+#Add a single letter in a random position in the string
+#s: the sting to be changed
 function add_letter(s)
     #random position (letter will be added on at the end)
     p = rand(1:length(s))
-    c = pick_leter()
-    #TODO add c to the middle of the string
+    c = pick_letter()
 
+    #add c to the middle of the string (split into first half, last half on the randomly chosen position)
+    fh = s[1:p]
+    lh = s[p+1:end]
+    s = fh*c*lh
+    return s
 end
 
+#Delete a single letter from a string
+#s: the string to be changed
 function delete_letter(s)
     #Letter at position p will be deleted
     p = rand(1:length(s))
@@ -154,6 +162,7 @@ function delete_letter(s)
     s = join(s)
     return s
 end
+
 #Run 4: Mutate the genome of each bug according to pre-defined probabilities
 #bug: the name of the bug file to mutate
 #Pc: probability of changing a letter
@@ -165,6 +174,7 @@ function run4(bug, Pm, PD)
 
     #array of column names
     cols = names(data)
+
     for i in 1:length(cols)
         for j in 1:length(data[cols[i]])
             #check if there is a mutation
@@ -172,34 +182,55 @@ function run4(bug, Pm, PD)
                 #change (1), addition (2), deletion (3)
                 c = rand(1:3)
                 #randomly pick a letter, change it to A, B, C, D
-                if c == 1
+                if (c == 1 && !ismissing(data[cols[i]][j]))
                     data[cols[i]][j] = change(data[cols[i]][j])
                 #randomly pick a position, add a letter following it
-                elseif c == 2
-                    #TODO add in add_letter()
+                elseif (c == 2 && !ismissing(data[cols[i]][j]))
+                    data[cols[i]][j] = add_letter(data[cols[i]][j])
                 #randomly pick a position, delete that letter
-                else
+                elseif (c == 3 && !ismissing(data[cols[i]][j]))
                     data[cols[i]][j] = delete_letter(data[cols[i]][j])
                 end
             end
+            #check if there is a deletion (NOT in coding sequence)
+            if (rand(Float64) < PD && i != length(cols))
+                data[cols[i]][j] = ""
+            end
         end
     end
+    #overwrite bug file
+    CSV.write(bug, data)
 end
 
 function main()
     #pick environment (1-15)
     env = (rand(Int) % 15) + 1
 
-    #loop through all bugs
-    bugs = ["bug1.csv", "bug2.csv", "bug3.csv", "bug4.csv"]
-    #for bug in bugs
-    #    run1(env, bug)
-    #    fitness = run2(env, bug[1:end-4])
-    #    println("Fitness of $bug is $fitness")
-    #end
+    #all bugs
+    bugs = ["bug1.csv", "bug2.csv", "bug3.csv", "bug4.csv", "bug5.csv"]
 
-    #bug, probability of mutation (change, deletion, or addition), probability of deletion
-    run4(bugs[1], .5, .05)
+    max = -Inf
+    max_bug = bugs[1]
+
+    #loop through all bugs
+    for bug in bugs
+        run1(env, bug)
+        fitness = run2(env, bug[1:end-4])
+        if fitness > max
+            max = fitness
+            max_bug = bug
+        end
+        run4(bug, .5, .05)
+        println("Fitness of $bug is $fitness")
+
+    end
+
+    #bug with highest fitness randomly switched with a bug
+    r = rand(1:length(bugs))
+    str = "Replacement: "*bugs[r]*" replaced with $max_bug"
+    println(str)
+    bugs[r] = max_bug
+    
 end
 
 main()

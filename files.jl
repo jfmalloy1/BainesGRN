@@ -33,7 +33,7 @@ function genotypes(init_chars, coding_len)
   gheader = "phenotype"
 
   #Open and writes 4 bug files
-  for m in 1:4
+  for m in 1:5
     f = open("bug$m.csv", "w")
     println(f, fheader)
     g = open("bug$m.phenotype.csv", "w")
