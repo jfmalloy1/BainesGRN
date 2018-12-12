@@ -205,32 +205,34 @@ end
 function main()
     #pick environment (1-15)
     env = (rand(Int) % 15) + 1
-
+    println("Env is: $env")
     #all bugs
     bugs = ["bug1.csv", "bug2.csv", "bug3.csv", "bug4.csv", "bug5.csv"]
 
-    max = -Inf
-    max_bug = bugs[1]
+    for i in 1:20
+        println("Run$i")
+        max = -Inf
+        max_bug = bugs[1]
 
-    #loop through all bugs
-    for bug in bugs
-        run1(env, bug)
-        fitness = run2(env, bug[1:end-4])
-        if fitness > max
-            max = fitness
-            max_bug = bug
+        #loop through all bugs
+        for bug in bugs
+            run1(env, bug)
+            fitness = run2(env, bug[1:end-4])
+            if fitness > max
+                max = fitness
+                max_bug = bug
+            end
+            run4(bug, 0, 0)
+            println("Fitness of $bug is $fitness")
+
         end
-        run4(bug, .5, .05)
-        println("Fitness of $bug is $fitness")
 
+        #bug with highest fitness randomly switched with a bug
+        r = rand(1:length(bugs))
+        str = "Replacement: "*bugs[r]*" replaced with $max_bug"
+        println(str)
+        bugs[r] = max_bug
     end
-
-    #bug with highest fitness randomly switched with a bug
-    r = rand(1:length(bugs))
-    str = "Replacement: "*bugs[r]*" replaced with $max_bug"
-    println(str)
-    bugs[r] = max_bug
-    
 end
 
 main()
